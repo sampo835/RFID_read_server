@@ -1,1 +1,13 @@
-<p>rfid-data works!</p>
+<div *ngIf="rfidData && rfidData.length > 0">
+  <h2>RFID Data</h2>
+  <ul>
+    <li *ngFor="let item of rfidData">
+      <strong>Tag:</strong> {{ item.tag }} | <strong>Timestamp:</strong>
+      {{ item.timestamp | date : "medium" }}
+    </li>
+  </ul>
+</div>
+
+<div *ngIf="!rfidData || rfidData.length === 0">
+  <p>No RFID data available.</p>
+</div>

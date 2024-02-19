@@ -8,6 +8,6 @@ export class ArduinoService {
   constructor(private http: HttpClient) {}
 
   getRfidData() {
-    return this.http.get('http://127.0.0.1:3000/RfidData/rfid-data');
+    return this.http.get('http://127.0.0.1:3000/rfid-data');
   }
 }

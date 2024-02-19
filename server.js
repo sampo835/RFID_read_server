@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const SerialPort = require("serialport");
 const Readline = require("@serialport/parser-readline");
+const cors = require("cors"); // Import the cors middleware
 
 // Connect to Mongo DB
 mongoose.connect("mongodb://127.0.0.1:27017/test2", {
@@ -17,7 +18,7 @@ const rfidScheme = new mongoose.Schema({
 // Model for the database
 const RfidData = mongoose.model("RfidData", rfidScheme);
 
-// Open seriaport
+// Open serialport
 const port = new SerialPort("COM4", { baudRate: 115200 });
 const parser = port.pipe(new Readline({ delimiter: "\r\n" }));
 
@@ -32,6 +33,9 @@ parser.on("data", (tag) => {
 // Create express app
 const app = express();
 
+// Use the cors middleware
+app.use(cors());
+
 // Route to get the RFID data
 app.get("/rfid-data", async (req, res) => {
   const rfidData = await RfidData.find();
@@ -39,4 +43,6 @@ app.get("/rfid-data", async (req, res) => {
 });
 
 // Start the server
-app.listen(3000);
+app.listen(3000, () => {
+  console.log("Server is running on port 3000");
+});
