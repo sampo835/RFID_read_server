@@ -1,84 +1,33 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const SerialPort = require("serialport");
 const Readline = require("@serialport/parser-readline");
-const cors = require("cors"); // Import the cors middleware
+const cors = require("cors");
 
-// Connect to Mongo DB
-mongoose.connect("mongodb://127.0.0.1:27017/test2", {
-  serverSelectionTimeoutMS: 5000,
-});
+const app = express();
+app.use(cors());
 
-// Define schema for RFID data
-const rfidScheme = new mongoose.Schema({
-  tag: String,
-  timestamp: Date,
-});
-
-// Model for the database
-const RfidData = mongoose.model("RfidData", rfidScheme);
-
-// Open serialport
+// Connect to the serial port
 const port = new SerialPort("COM4", { baudRate: 115200 });
 const parser = port.pipe(new Readline({ delimiter: "\r\n" }));
 
-// Listen for RFID tag reads
-/*parser.on("data", (tag) => {
-  console.log("Received RFID tag:", tag);
-  // Save the RFID tag read to MongoDB
-  const rfidData = new RfidData({ tag, timestamp: new Date() });
-  rfidData.save();
-});*/
+// Define a variable to store the RFID tag temporarily
+let rfidData = null;
 
 parser.on("data", (tag) => {
   console.log("Received RFID tag:", tag);
 
-  /*/ Send RFID tag as part of the response
-  res.json({ tag, message: "Scan successful" });*/
+  // Store the RFID tag data in the variable
+  rfidData = tag;
 });
 
-// Create express app
-const app = express();
-
-// Use the cors middleware
-app.use(cors());
-
-// ...
-
-let currentResponse; // Variable to store the current response object
-
-// Function to handle RFID tag reading
-function handleRfidTag(tag) {
-  console.log("Received RFID tag:", tag);
-
-  // Send RFID tag as part of the response
-  if (currentResponse) {
-    currentResponse.json({ tag, message: "Scan successful" });
-    currentResponse = null; // Reset the response object
-  }
-}
-
-/*/ Route to start the RFID scan
-app.get("/start-scan", (req, res) => {
-  // Trigger RFID scan here if needed
-  // You might need to send a signal to your Arduino to start the scan
-  res.json({ message: "Scan initiated" });
+// Endpoint to get the last received RFID tag
+app.get("/api/rfid", (req, res) => {
+  // Send the stored RFID tag data as part of the response
+  res.json({ tag: rfidData, message: "Last RFID tag read" });
 });
-
-// Route to get the RFID data
-app.get("/rfid-data", (req, res) => {
-  // Assign the current response object
-  currentResponse = res;
-
-  // Assuming you are still using the same SerialPort and parser setup here
-  parser.on("data", (tag) => {
-    handleRfidTag(tag);
-  });
-});
-
-// ...*/
 
 // Start the server
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
+const portNumber = 3000;
+app.listen(portNumber, () => {
+  console.log(`Server is running on port ${portNumber}`);
 });
