@@ -1,4 +1,4 @@
-<div *ngIf="rfidData && rfidData.length > 0">
+<!--<div *ngIf="rfidData && rfidData.length > 0">
   <h2>RFID Data</h2>
   <ul>
     <li *ngFor="let item of rfidData">
@@ -6,8 +6,16 @@
       {{ item.timestamp | date : "medium" }}
     </li>
   </ul>
-</div>
+</div>-->
 
 <div *ngIf="!rfidData || rfidData.length === 0">
   <p>No RFID data available.</p>
 </div>
+
+<div *ngIf="!scanning && !scanSuccess">
+  <button (click)="startScan()">Start RFID Scan</button>
+</div>
+
+<div *ngIf="scanning">Scanning...</div>
+
+<div *ngIf="scanSuccess">Scan successful! RFID tag: {{ rfidData.tag }}</div>
